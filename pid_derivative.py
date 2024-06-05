@@ -15,19 +15,19 @@ def main():
     f_3db = 1000
     tau = 1/(2 * np.pi * f_3db)
 
+    N = 1/tau
+    Kd = 0.5
+
     # plot from 1Hz to 100kHz
     freq = np.logspace(1, 5)
     w = 2 * np.pi * freq
     s = 1j * w
 
-    # low pass filter frequency response
-    h_lpf = 1 / (s * tau + 1)
-
-    # low pass filter step response
-    t_lpf = h_lpf * 1/s
-
     # high pass filter frequency response
     h_hpf = tau / (tau + 1/s)
+
+    h_pid = N * Kd / (1 + N/s)
+
 
 
     # create axes
@@ -38,19 +38,20 @@ def main():
     ax[0].grid()
     ax[1].set_xlabel('Frequency (Hz)')
     ax[1].set_ylabel('Phase (deg)')
-    ax[1].set_ylim(-90, 90)
+    ax[1].set_ylim(-90, 0)
     ax[1].grid()
+
 
 
     # gain plot
     ax[0].semilogx(
         freq, np.gain_db(h_lpf), 'b-',
-        freq, np.gain_db(h_hpf), 'r-')
+        freq, np.gain_db(h_pid), 'r-')
 
     # phase plot
     ax[1].semilogx(
-        freq, np.phase(h_lpf), 'b-',
-        freq, np.phase(h_hpf), 'r-')
+        freq, np.phase(h_lpf), 'k-',
+        freq, np.phase(h_pid), 'k-')
     
     plt.show()
 
