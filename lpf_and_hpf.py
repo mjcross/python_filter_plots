@@ -20,16 +20,20 @@ def main():
     w = 2 * np.pi * freq
     s = 1j * w
 
-    # low pass filter response
+    # low pass filter frequency response
     h_lpf = 1 / (s * tau + 1)
 
-    # high pass filter response
+    # low pass filter step response
+    t_lpf = h_lpf * 1/s
+
+    # high pass filter frequency response
     h_hpf = tau / (tau + 1/s)
 
 
 
     # create axes
     fig, ax = plt.subplots(2, 1)
+    ax[0].set_title('Frequency Domain')
     ax[0].set_xlabel('Frequency (Hz)')
     ax[0].set_ylabel('Gain (dB)')
     ax[0].grid()
@@ -37,6 +41,8 @@ def main():
     ax[1].set_ylabel('Phase (deg)')
     ax[1].set_ylim(-90, 0)
     ax[1].grid()
+    ax[0].set_title('Time Domain')
+
 
 
     # gain plot
@@ -48,7 +54,7 @@ def main():
     ax[1].semilogx(
         freq, np.phase(h_lpf), 'k-',
         freq, np.phase(h_lpf), 'k-')
-
+    
     plt.show()
 
 if __name__ == '__main__':
