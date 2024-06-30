@@ -63,7 +63,7 @@ def main():
     ax.set_ylim(-60, 10)
     ax.grid()
 
-    ax.semilogx(freq, np.gain_db(gain), 'b-')
+    ax.semilogx(freq, np.gain_db(gain), 'r-')
     plt.show()
 
 
