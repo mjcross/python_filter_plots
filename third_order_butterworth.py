@@ -23,21 +23,14 @@ def main():
     # sweep frequency from 100Hz - 10KHz
     freq = np.logspace(2, 4, num=512)
     w = 2 * np.pi * freq
-    s = 1j * w          # equivalent of frequency in Laplace domain
-    z = np.exp(s * T)   # equivalent of frequency in Z domain
+    s = 1j * w              # equivalent of frequency in Laplace domain
+    z = np.exp(1j * w * T)  # equivalent of frequency in Z domain
 
     # Laplace domain poles of 3rd order Butterworth
     num_poles = 3
     all_poles = np.exp(1j * np.linspace(0, 2*np.pi, 2*num_poles, endpoint=False))   # evenly spaced around the unit circle 
     s_poles = [pole for pole in all_poles if np.real(pole) <= 0]                    # select poles in lefthand half plane
     print('Laplace domain poles:', s_poles)
-
-    # continuous time frequency response
-    Gc = 1 / ((s*tau - s_poles[0]) * (s*tau - s_poles[1]) * (s*tau - s_poles[2]))
-
-    # discrete time frequency response
-    s_equiv = (2/T) * (z-1)/(z+1)
-    Gd = 1 / ((s_equiv*tau - s_poles[0]) * (s_equiv*tau - s_poles[1]) * (s_equiv*tau - s_poles[2]))
 
     # create axes
     fig, ax = plt.subplots(2, 1)
@@ -52,17 +45,20 @@ def main():
     ax[1].grid()
 
 
+    # continuous time frequency response
+    Gc = 1 / ((s * tau - s_poles[0]) * (s*tau - s_poles[1]) * (s*tau - s_poles[2]))
+
+    # discrete time frequency response
+    Gd = 1 / (((2/T) * (z-1)/(z+1) * tau - s_poles[0]) * ((2/T) * (z-1)/(z+1) * tau - s_poles[1]) * ((2/T) * (z-1)/(z+1) * tau - s_poles[2]))
+
     # gain plot
-    ax[0].semilogx(
-        freq, np.gain_db(Gc), 'b-',
-        freq, np.gain_db(Gd), 'r-'
-    )
+    ax[0].semilogx(freq, np.gain_db(Gc), 'b-', label=r'$G_c(j\omega)$')
+    ax[0].semilogx(freq, np.gain_db(Gd), 'r-', label=r'$G_d(e^{j\omega T})$')
+    ax[0].legend()
 
     # phase plot
-    ax[1].semilogx(
-        freq, np.phase(Gc), 'b-',
-        freq, np.phase(Gd), 'r-'
-    )
+    ax[1].semilogx(freq, np.phase(Gc), 'b-', label=r'$G_c(j\omega)$')
+    ax[1].semilogx(freq, np.phase(Gd), 'r-', label=r'$G_d(e^{j\omega T})$')
     
     plt.show()
 
