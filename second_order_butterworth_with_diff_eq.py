@@ -141,7 +141,7 @@ def main():
     ax[1].plot(1000*t, step_resp_d, 'g-', label='difference equation')
 
     # note that the digital filter introduces a delay of half a sample
-    ax[1].plot(1000*(t-0.5*T), step_resp_c, 'b--', label=r'CT with $\frac{1}{N}$ sample delay')
+    ax[1].plot(1000*(t-0.5*T), step_resp_c, 'b--', label=r'CT with $\frac{1}{2}$ sample delay')
     ax[1].legend()
     ax[1].set_title('Step response')
 
