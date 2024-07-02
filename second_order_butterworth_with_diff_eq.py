@@ -34,11 +34,13 @@ def main():
     ]
 
     # create axes
-    fig, ax = plt.subplots(2, 1)
+    fig, ax = plt.subplots(1, 2)
     ax[0].set_xlabel('Frequency (Hz)')
     ax[0].set_ylabel('Gain (dB)')
     ax[0].set_ylim(-60, 10)
     ax[1].set_xlabel('Time (ms)')
+    ax[0].set_box_aspect(aspect=1)
+    ax[1].set_box_aspect(aspect=1)
     
     # continuous time frequency response
     Gc = 1 / ((s * tau - s_poles[0]) * (s*tau - s_poles[1]))
@@ -117,7 +119,14 @@ def main():
         y1 = y0
 
     t = np.array(t_list)
-    step_resp = np.array(step_resp_list)
+    step_resp_d = np.array(step_resp_list)
+
+    # continuous time step response (see https://dsp.stackexchange.com/questions/63780)
+
+    r1 = 0.707j     # coefficients of partial fraction expansion of Gc
+    r2 = -0.707j
+
+    step_resp_c = 1 + r1 * np.exp(s_poles[1] * t/tau) / s_poles[1] + r2 * np.exp(s_poles[0] * t/tau) / s_poles[0]
 
     # plot gains versus frequency
     ax[0].semilogx(freq, np.gain_db(Gc), 'b-', label=r'CT response')
@@ -125,10 +134,16 @@ def main():
     #ax.semilogx(freq, np.gain_db(Gd2), 'k--', label=r'DT proper rational')
     ax[0].semilogx(freq, np.gain_db(gt), 'g-', label=r'DT difference eq')
     ax[0].legend()
+    ax[0].set_title('Frequency response')
 
     # plot step response
-    ax[1].plot(1000*t, step_resp, 'g-', label='step response')
+    ax[1].set_ylabel('step response')
+    ax[1].plot(1000*t, step_resp_d, 'g-', label='difference equation')
+
+    # note that the digital filter introduces a delay of half a sample
+    ax[1].plot(1000*(t-0.5*T), step_resp_c, 'b--', label=r'CT with $\frac{1}{N}$ sample delay')
     ax[1].legend()
+    ax[1].set_title('Step response')
 
     plt.tight_layout()
     plt.show()
